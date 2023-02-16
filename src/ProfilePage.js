@@ -2,11 +2,11 @@ import { useState } from "react";
 import ethIcon from "./ethIcon.png";
 import Web3 from "web3";
 export function ProfilePage(){
-  
   let [isEdit, setIsEdit] = useState(false); 
   var [imageUrl, setImageUrl] = useState("http://placehold.it/200x200");
   var [name, setName] = useState("Name") ;
   let [account, setAccount] = useState(null);
+
  const handleEdit = ()=>{
   setIsEdit(t => !t) ;
  }
@@ -40,12 +40,58 @@ export function ProfilePage(){
       await provider.request({method: 'eth_requestAccounts'}) ;
       const web3 = new Web3(provider) ;
       const userAccount = await web3.eth.getAccounts() ;
-      setAccount(userAccount[0]);
-      provider.on("accountsChanged", (accounts)=>{
-        setAccount(accounts[0]);
+      await fetch('http://localhost:4000/api/account', {
+          method: 'POST',
+          body: JSON.stringify({ethAddress:userAccount[0]}),
+          headers: { 'Content-Type': 'application/json' },
+        })
+        .then(async account =>{
+          account = await account.json()
+          
+          console.log(account._id);
+          
+          setAccount(account.ethAddress);
+          if(account.profile){
+            setImageUrl("http://localhost:4000/uploads/"+account.profile);
+          }
+          if(account.name){
+            setName(account.name);
+          }
+          
+      })
+        .catch(error => {
+          console.error('Error connecting account ', error);
+        });
+      
+      provider.on("accountsChanged", async (accounts)=>{
+        console.log("62");
+        await fetch('http://localhost:4000/api/account', {
+          method: 'POST',
+          body: JSON.stringify({ethAddress:accounts[0]}),
+          headers: { 'Content-Type': 'application/json' },
+        })
+        .then(async account =>{
+          account = await account.json()
+          
+          console.log(account._id);
+          
+          setAccount(account.ethAddress);
+          if(account.profile){
+            setImageUrl("http://localhost:4000/uploads/"+account.profile);
+          }
+          
+          if(account.name){
+            setName(account.name);
+          }
+          
+      })
+        .catch(error => {
+          console.error('Error connecting account ', error);
+        });
         //database query for account creation and logging
+
       });
-      let ethBalance = await web3.eth.getBalance(account) ;
+      //let ethBalance = await web3.eth.getBalance(account) ;
     }
   }catch(err){
     console.log(err);

@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
 import db from "./dbConnection.js"
-
+import { ObjectId } from 'mongodb';
 
 const app = express()
 app.use(cors())
@@ -35,19 +35,27 @@ app.get('/api/explore', async function(req, res){
   let latest = await db.collection("contents").find({}).sort({ _id: -1 }).limit(20).toArray();
   res.send({code:200, data:latest});
 })
-app.get('/api/account', async function(req, res){
-  console.log("38");
-  let account = await db.collection("accounts").findOne({}, {projection:{ethAddress:req.body.ethAddress}});
-  console.log(account);  
+app.post('/api/account', async function(req, res){
+  // console.log("38");
+  //console.log(req.body);
+  let account = await db.collection("accounts").findOne({ethAddress:req.body.ethAddress}, {projection:{_id:1, ethAddress:1, profile:1, name:1}});
+  console.log(account);
+
   if(account != null){
-  console.log("42");
-    res.send({code:200, data:account});
+  // console.log("42");
+    res.send(account);
   }
   else{
     db.collection("accounts").insertOne({ethAddress:req.body.ethAddress})
-    res.send({code:200, msg:"new account created"});
+    account = await db.collection("accounts").findOne({ethAddress:req.body.ethAddress}, {projection:{_id:1, ethAddress:1, profile:1, name:1}});
+    res.send(account);
   }
 })
+app.get('/contents/:_id', async function(req, res) {
+  const _id = req.params._id;
+  let content = await db.collection("contents").findOne({_id:new ObjectId(_id)});
+  res.send({code:200, data:content});
+});
 app.post('/api/updateAccount', upload.single('image'), async function(req, res){
   if(!req.file){
       res.send({code:500, msg:'account Update failed'});
