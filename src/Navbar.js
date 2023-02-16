@@ -11,7 +11,7 @@ export function Navbar(prop){
     <SearchBar />
     </div>
     <div style={{display: "flex",justifyContent: "end", width:"30%"}}>
-    <Link to="/profile" style={{width:"100%"}}><button style={{width:"25%", background:"transparent", border:"none"}}><img src={profileImg} style={{width:"100%"}}/></button></Link>
+    <Link to="/profile" style={{width:"100%"}}><button style={{width:"25%", background:"transparent", border:"none"}} ><img src={profileImg} style={{width:"100%"}}/></button></Link>
     <Link to="/upload" style={{width:"100%"}}><button style={{width:"25%", background:"transparent", border:"none"}}><img src={addImg} style={{width:"100%"}}/></button></Link>
     </div>
     </div>);

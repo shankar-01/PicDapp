@@ -36,3 +36,51 @@
     transform: rotate(360deg);
   }
 }
+.imgProfile{
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 1px solid black;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+.profileText{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin-left: 10px;
+  align-self: center;
+}
+.profiledetails{
+  background-color: #282c343a;
+  padding: 30px;
+}
+.ethIcon1{
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+  
+}
+.editButton{
+  color: blue;
+  cursor: pointer;
+}
+.editButton:hover{
+  color: rgba(67, 5, 238, 0.815);
+  text-decoration: underline;
+}
+.EditingSection{
+  background-color: #282c343a;
+  /* height: 300px; */
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+
+}
+.imageChose{
+  padding: 10px;
+ 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

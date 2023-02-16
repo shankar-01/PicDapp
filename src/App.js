@@ -5,7 +5,6 @@ import { ExploreContent } from './ExploreContent';
 import { Upload } from './Upload';
 import { ProfilePage } from './ProfilePage';
 import { Homepage } from './Homepage';
-
 import {
   BrowserRouter as Router,
   Routes,
@@ -13,7 +12,7 @@ import {
 
 } from "react-router-dom";
 function App() {
- 
+  
   return (
     <div className="App"> 
     <Router>
@@ -26,7 +25,7 @@ function App() {
            element={<Upload />}>
           </Route>
           <Route path="/exploreContent" element={<ExploreContent/>}></Route>
-          <Route path="/profile" element={<ProfilePage/>}></Route>
+          <Route path="/profile" element={<ProfilePage />}></Route>
         </Routes>
       </Router>
     </div>  
