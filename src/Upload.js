@@ -1,13 +1,23 @@
 import {Button} from 'react-bootstrap';
 import { useRef } from 'react';
 import uploadIcon from "./uploadIcon.png"
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
+import Web3 from "web3";
 export function Upload(prop){
     const fileInputRef = useRef(null);
     const reader = new FileReader();
     const [file, setFile] = useState(null);
+    const [picDapp, setPicDapp] = useState(null); //PicDapp Contract details
+
+  useEffect(() => {
+    // fetch data from server
+    fetch('http://localhost:4000/api/PicDappContract')
+      .then(response => response.json())
+      .then(data => setPicDapp(data))
+      .catch(error => console.error(error));
+  }, []);
     const [show, setShow] = useState(null);
     const handleClose = () => setShow(false);
     const handleClick = () => {
@@ -15,18 +25,33 @@ export function Upload(prop){
     };
     const handleSubmit = (event)=> {
         event.preventDefault();
-    
+
         const formData = new FormData();
         const title = document.getElementById("titleTxt").value;
         const description = document.getElementById("descriptionTxt").value;
+        const price = Number(document.getElementById("priceTxt").value);
         formData.append('image', file);
         formData.append('title', title);
         formData.append('description', description);
-        const res = fetch('http://localhost:4000/api/upload', {
+        fetch('http://localhost:4000/api/upload', {
           method: 'POST',
           body: formData
         })
-        .then(response => {
+        .then(async response => {
+            response = await response.json();
+            const art = response.imageLink;
+            const watermark = response.watermarkImgLink;
+            //access contract
+            const web3 = new Web3('http://localhost:7545');
+            const contract = new web3.eth.Contract(picDapp.contractabi, picDapp.contract_address);
+            //call function of buy (art, watermark, price)
+            contract.methods.addContent(art, watermark, price).call((err, result)=>{
+              if(err){
+                console.log(err);
+              }
+              console.log(result);
+            });
+            // store it on db (address, title description)
             setShow(true);
         })
         .catch(error => {
@@ -34,7 +59,7 @@ export function Upload(prop){
         });
       }
     const handleFileChange = (event) => {
-      
+
       reader.onload = (event) => {
       let image = document.getElementById("uploadImg");
       image.src = event.target.result;
@@ -46,8 +71,11 @@ export function Upload(prop){
     };
     return (<div>
       <img src={uploadIcon} id="uploadImg"/><br />
-      {file?<><input type="text" style={{width:"60%"}} placeholder="Title" id="titleTxt"/><br/><br/>
-      <input type="tex" style={{width:"60%"}} placeholder="Description" id="descriptionTxt"/><br/><br/></>:<></>}
+      {file?<>
+      <input type="number" style={{width:"60%"}} placeholder="Price in Wei" id="priceTxt"/><br/><br/>
+      <input type="text" style={{width:"60%"}} placeholder="Title" id="titleTxt"/><br/><br/>
+      <input type="text" style={{width:"60%"}} placeholder="Description" id="descriptionTxt"/><br/><br/>
+      </>:<></>}
       <Button onClick={handleClick} id="uploadBtn">Browse</Button>
       <input
           type="file"
@@ -67,7 +95,6 @@ export function Upload(prop){
           </Button></Link>
         </Modal.Footer>
       </Modal>
-        
+
     </div>);
   }
-  
