@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
 import db from "./dbConnection.js"
-import { ObjectId } from 'mongodb';
 import Jimp from 'jimp';
 import fs from 'fs';
 const app = express()
@@ -44,11 +43,15 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
     }
   });
 
-app.post('/api/addContent', (req, res)=>{
-  db.collection("contents").insertOne({title:req.body.title, description:req.body.description, address:req.body.address}, function(err, res){
+app.post('/api/addContent',async (req, res)=>{
+  console.log("line 47");
+  console.log(req.body);
+  await db.collection("contents").insertOne({title:req.body.title, description:req.body.description, address:req.body.address}, function(err, res2){
       if(err)throw err
       console.log("added")
+      res.send({code:200, msg:"added ok"});
   });
+  res.send({})
 })
 
 app.get('/api/PicDappContract', async function(req, res){

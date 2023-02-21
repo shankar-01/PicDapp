@@ -10,7 +10,7 @@ export function Upload(prop){
     const reader = new FileReader();
     const [file, setFile] = useState(null);
     const [picDapp, setPicDapp] = useState(null); //PicDapp Contract details
-
+    const [account, setAccount] = useState(null);
   useEffect(() => {
     // fetch data from server
     fetch('http://localhost:4000/api/PicDappContract')
@@ -23,16 +23,40 @@ export function Upload(prop){
     const handleClick = () => {
       fileInputRef.current.click();
     };
+    const ConnectToWallet = async() => {
+      try{
+        let provider; 
+        if(window.ethereum){
+          provider = window.ethereum ;
+        }
+        else if((window.web3)){
+          provider = window.web3 ;
+        }
+        else{
+          console.log("No wallet found") ;
+        }
+        if(provider){
+          await provider.request({method: 'eth_requestAccounts'}) ;
+          const web3 = new Web3(provider) ;
+          const userAccount = await web3.eth.getAccounts() ;
+          setAccount(userAccount[0]);
+        }
+      }catch(err){
+        console.log(err);
+      }
+    }
     const handleSubmit = (event)=> {
         event.preventDefault();
-
+        if(!account){
+          ConnectToWallet();
+          return;
+        }
+        
         const formData = new FormData();
         const title = document.getElementById("titleTxt").value;
         const description = document.getElementById("descriptionTxt").value;
         const price = Number(document.getElementById("priceTxt").value);
         formData.append('image', file);
-        formData.append('title', title);
-        formData.append('description', description);
         fetch('http://localhost:4000/api/upload', {
           method: 'POST',
           body: formData
@@ -42,17 +66,36 @@ export function Upload(prop){
             const art = response.imageLink;
             const watermark = response.watermarkImgLink;
             //access contract
-            const web3 = new Web3('http://localhost:7545');
+            const web3 = new Web3(window.ethereum);
             const contract = new web3.eth.Contract(picDapp.contractabi, picDapp.contract_address);
+            console.log("my contract : " + contract);
+            console.log("abi : " + picDapp.contractabi);
+            console.log("address : " + picDapp.contract_address);
             //call function of buy (art, watermark, price)
-            contract.methods.addContent(art, watermark, price).call((err, result)=>{
-              if(err){
-                console.log(err);
+            contract.methods.addContent(art, watermark, price).send({from:account, gas:2000000})
+            .on('receipt', (receipt) => {
+              // Check if the event was emitted
+              if (receipt.events.MyEvent) {
+                // Get the return value from the event
+                const returnValue = receipt.events.MyEvent.returnValues.myValue;
+              // store it on db (address, title description)
+              
+              const contentDetail = {title:title, description:description, address:returnValue};
+              fetch('http://localhost:4000/api/addContent', {
+                method:'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(contentDetail)
+              })
+              setShow(returnValue);
+              
+              } else {
+                console.error('Event not emitted');
               }
-              console.log(result);
-            });
-            // store it on db (address, title description)
-            setShow(true);
+            }).catch((error) => {
+              console.error('Error:', error);
+          });            
         })
         .catch(error => {
           console.error('Error uploading image', error);
@@ -69,6 +112,7 @@ export function Upload(prop){
       // Perform any other actions with the selected file
       setFile(event.target.files[0]);
     };
+    ConnectToWallet();
     return (<div>
       <img src={uploadIcon} id="uploadImg"/><br />
       {file?<>
@@ -90,11 +134,10 @@ export function Upload(prop){
         </Modal.Header>
         <Modal.Body>your image uploaded successfully!</Modal.Body>
         <Modal.Footer>
-          <Link to="/exploreContent"><Button variant="primary" onClick={handleClose}>
+          <Link to='/'><Button variant="primary" onClick={handleClose}>
             OK
           </Button></Link>
         </Modal.Footer>
       </Modal>
-
     </div>);
   }
