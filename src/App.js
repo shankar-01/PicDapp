@@ -4,16 +4,51 @@ import { Navbar } from './Navbar';
 import { Upload } from './Upload';
 import { ProfilePage } from './ProfilePage';
 import { Homepage } from './Homepage';
+import Web3 from "web3";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
 
 } from "react-router-dom";
+import { useState } from 'react';
+import FirstPage from './FirstPage';
+
+
+
+
 function App() {
-  
+  const [isConnected, setIsConnected] = useState(false);
+  const [userAdress, setUserAddress]   = useState("") ;
+
+  const ConnectToWallet = async() => {
+    try{
+      let provider; 
+      if(window.ethereum){
+        provider = window.ethereum ;
+      }
+      else if((window.web3)){
+        provider = window.web3 ;
+      }
+      else{
+        console.log("no wallet")
+      }
+      if(provider){
+        await provider.request({method: 'eth_requestAccounts'}) ;
+        const web3 = new Web3(provider) ;
+        const userAccount = await web3.eth.getAccounts() ;
+        setIsConnected(true) ;
+        setUserAddress(userAccount) ;
+        console.log(userAccount);
+        
+      }
+    }catch(err){
+      console.log(err)
+    }
+  }
+
   return (
-    <div className="App"> 
+    isConnected ? ( <div className="App"> 
     <Router>
       <Navbar />
       <Routes>
@@ -26,7 +61,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />}></Route>
         </Routes>
       </Router>
-    </div>  
+    </div>  ) : <FirstPage handleClick={ConnectToWallet}/>
   );
 }
 export default App;
