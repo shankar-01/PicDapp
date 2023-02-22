@@ -6,14 +6,14 @@ try {
 } catch (error) {
 	console.error('Error:', error);
 }
-const address = "0x5E56e848aD13fc94c88C977f5EAEcd2c99474F27";
+const address = "0x8fb3107040CE1ce290E2da9921e080aA70858D6e";
 const web3 = new Web3('http://127.0.0.1:7545');
 const contract = new web3.eth.Contract(picDapp, address);
 const art = "abc";
 const watermark = "xyz";
 const price = 10;
-const account = '0xa399AA039F337976e4BC8E2CB00aaa7E427b0B49';
-/*contract.methods.addContent(art, watermark, price).send({from:account, gas:2000000})
+const account = '0x1aE2481227ca792AbBf5413FF1aC2B1b1C64D48A';
+contract.methods.addContent(art, watermark, price).send({from:account, gas:2000000})
 .on('receipt', (receipt) => {
     // Check if the event was emitted
     if (receipt.events.MyEvent) {
@@ -26,7 +26,7 @@ const account = '0xa399AA039F337976e4BC8E2CB00aaa7E427b0B49';
   })
   .catch((error) => {
     console.error('Error:', error);
-});*/
+});
 contract.methods.getContents(account).call()
   .then((returnValue) => {
     console.log('Return value:', returnValue);

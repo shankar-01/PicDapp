@@ -18,7 +18,7 @@ var storage = multer.diskStorage({
   });
 const upload = multer({ storage: storage });
 const watermarkImg = async function(path){
-  const image = await Jimp.read(path);
+  const image = await Jimp.read("./uploads/"+path);
   const watermark = await Jimp.read('./watermark.png');
   watermark.resize(image.bitmap.width * 0.5, Jimp.AUTO); // resize the watermark to half the image width
 
@@ -28,7 +28,7 @@ const watermarkImg = async function(path){
     opacitySource: 0.5
   });
   const watermarkedImagePath = `${path.substring(0, path.indexOf("."))}_watermarkedArt.jpg`;
-  await image.writeAsync(watermarkedImagePath); // save the image with watermark
+  await image.writeAsync("./uploads/"+watermarkedImagePath); // save the image with watermark
   return watermarkedImagePath;
 }
 
@@ -38,8 +38,8 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
     }
     else{
       console.log("here ok");
-        const watermarkImgLink = await watermarkImg(req.file.path);
-        res.send({code:200, msg:'file upload successful!', imageLink:req.file.path, watermarkImgLink:watermarkImgLink});
+        const watermarkImgLink = await watermarkImg(req.file.filename);
+        res.send({code:200, msg:'file upload successful!', imageLink:req.file.fieldname, watermarkImgLink:watermarkImgLink});
     }
   });
 

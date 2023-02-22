@@ -4,13 +4,16 @@ export function MyCard(prop){
     return (
       <Col md="4">
       <Card style={{ width: '18rem' }}>
-        <Card.Img variant="top" src={obj.image} />
+        {console.log("content card : ", obj.content)};
+        <Card.Img variant="top" src={`http://localhost:4000/uploads/${obj.content}`} />
         <Card.Body>
           <Card.Title>{obj.title}</Card.Title>
+          <Card.Text>Price : {obj.price}</Card.Text>
+          <Card.Text>Owner : {obj.owner}</Card.Text>
           <Card.Text>
-            {obj.text}
+            {obj.description}
           </Card.Text>
-          <Button variant="primary">Buy</Button>
+          <Button variant="primary">{obj.isLicensor?"Preview":"Buy"}</Button>
         </Card.Body>
       </Card>
       </Col>

@@ -1,7 +1,6 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';  
 import { Navbar } from './Navbar';
-import { ExploreContent } from './ExploreContent';
 import { Upload } from './Upload';
 import { ProfilePage } from './ProfilePage';
 import { Homepage } from './Homepage';
@@ -24,7 +23,6 @@ function App() {
           path="/upload"
            element={<Upload />}>
           </Route>
-          <Route path="/exploreContent" element={<ExploreContent/>}></Route>
           <Route path="/profile" element={<ProfilePage />}></Route>
         </Routes>
       </Router>
