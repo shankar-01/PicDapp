@@ -39,8 +39,10 @@ function App() {
         const userAccount = await web3.eth.getAccounts() ;
         setIsConnected(true) ;
         setUserAddress(userAccount) ;
-        console.log(userAccount);
-        
+        //console.log(userAccount);
+        provider.on("accountsChanged", async (accounts)=>{
+          setUserAddress(userAccount);
+        }); 
       }
     }catch(err){
       console.log(err)
@@ -52,7 +54,7 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
-          <Route path="/" element={<Homepage/>}>
+          <Route path="/" element={<Homepage account={userAdress} />}>
           </Route>
           <Route 
           path="/upload"

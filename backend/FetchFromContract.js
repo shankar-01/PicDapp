@@ -15,6 +15,7 @@ export function fetchFromContract(contractAddress){
       const artContract = resp;
       //console.log(artContract)
       contract = new web3.eth.Contract(artContract.contractabi, contractAddress);
+      
       contract.methods.getArt().call({from:accounts[0]}).then(res=>{
         content = res;
         contract.methods.getOwner().call().then(res=>{

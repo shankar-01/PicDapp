@@ -19,7 +19,7 @@ web3.eth.getAccounts().then((accounts) => {
     arguments: []
   }).send({
     from: firstAccount, // the address of the account you want to deploy the contract from
-    gas: 1500000, // the amount of gas you want to use for the deployment
+    gas: 6721975, // the amount of gas you want to use for the deployment
     gasPrice: '30000000000' // the price you are willing to pay for each unit of gas
   }).then((newContractInstance) => {
     fs.writeFile('picDappAdd.txt', newContractInstance.options.address, (err) => {

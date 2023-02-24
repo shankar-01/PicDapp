@@ -4,6 +4,7 @@ import multer from 'multer';
 import db from "./dbConnection.js"
 import Jimp from 'jimp';
 import fs from 'fs';
+import https from 'https';
 const app = express()
 app.use(cors())
 app.use(express.json())
@@ -39,7 +40,7 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
     else{
       console.log("here ok");
         const watermarkImgLink = await watermarkImg(req.file.filename);
-        res.send({code:200, msg:'file upload successful!', imageLink:req.file.fieldname, watermarkImgLink:watermarkImgLink});
+        res.send({code:200, msg:'file upload successful!', imageLink:req.file.filename, watermarkImgLink:watermarkImgLink});
     }
   });
 
@@ -76,7 +77,7 @@ app.get('/api/explore', async function(req, res){
   res.send({code:200, data:latest});
 })
 app.post('/api/account', async function(req, res){
-  let account = await db.collection("accounts").findOne({ethAddress:req.body.ethAddress}, {projection:{_id:1, ethAddress:1, profile:1, name:1}});
+  let account = await db.collection("accounts").findOne({ethAddress:req.body.ethAddress}, {projection:{_id:1, ethAddress:1}});
   console.log(account);
 
   if(account != null){
@@ -106,6 +107,16 @@ app.post('/api/updateAccount', upload.single('image'), async function(req, res){
 app.get('/uploads/:filename', function(req, res) {
     const fileName = req.params.filename;
     res.sendFile("uploads\\"+fileName, { root: '.' })
+  });
+app.get('/download/:filename', (req, res) => {
+    const fileName = req.params.filename;
+    const filePath = `./uploads/${fileName}`;
+  
+    const fileStream = fs.createReadStream(filePath);
+  
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    fileStream.pipe(res);
   });
 app.listen(4000, () => {
     console.log('Server started on port 4000');

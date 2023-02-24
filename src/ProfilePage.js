@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ethIcon from "./ethIcon.png";
 import Web3 from "web3";
+import { MyArts } from "./MyArts";
 export function ProfilePage(){
   let [isEdit, setIsEdit] = useState(false); 
   var [imageUrl, setImageUrl] = useState("http://placehold.it/200x200");
@@ -48,7 +49,7 @@ export function ProfilePage(){
         .then(async account =>{
           account = await account.json()
           
-          console.log(account._id);
+          //console.log(account._id);
           
           setAccount(account.ethAddress);
           if(account.profile){
@@ -109,6 +110,8 @@ ConnectToWallet();
       name={name} 
       />}
     </div>:<></>}
+    <h2>My Arts</h2>
+    <MyArts />
     </div>
     );
 }
